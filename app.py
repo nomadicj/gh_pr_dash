@@ -13,7 +13,8 @@ def calculate_age(created_at):
     return (datetime.utcnow() - created_date).days
 
 @app.route('/')
-def index():
+@app.route('/repo/<repo_name>')
+def index(repo_name=None):
     org_name = os.getenv('ORG_NAME')  # Pulls the organization name from .env
     token = os.getenv('GITHUB_TOKEN')  # Pulls the GitHub token from .env
 
@@ -35,7 +36,24 @@ def index():
                 'comments': pr.get('comments', 0)
             } for pr in prs]
 
-    return render_template('index.html', org_name=org_name, prs_by_repo=prs_by_repo)
+    repo_names = [repo['name'] for repo in repos]  # Extract repository names
+
+    repo_pr_counts = {repo: len(prs) for repo, prs in prs_by_repo.items()}
+
+    if repo_name and repo_name in prs_by_repo:
+        selected_prs = prs_by_repo[repo_name]
+    else:
+        selected_prs = []
+
+    return render_template(
+        'index.html',
+        org_name=org_name,
+        prs_by_repo=prs_by_repo,
+        repo_names=repo_names,
+        repo_pr_counts=repo_pr_counts,
+        selected_prs=selected_prs,
+        selected_repo=repo_name
+        )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

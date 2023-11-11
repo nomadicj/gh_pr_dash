@@ -30,36 +30,93 @@
             background-color: #007bff;
             border-color: #007bff;
         }
+        .sidebar {
+            position: relative; /* Needed for absolute positioning inside */
+            padding-bottom: 60px; /* Give enough space for the button */
+            height: 100vh;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            padding: 20px;
+            width: 250px; /* Adjust as needed */
+            position: fixed;
+        }
+        .content {
+            margin-left: 250px; /* Adjust based on sidebar width */
+        }
+        .sidebar {
+            /* ... existing sidebar styles ... */
+        }
+        .content {
+            /* ... existing content styles ... */
+        }
+
+        /* Dark mode specific styles */
+        .dark-mode {
+            background-color: #343a40; /* Dark background for body */
+            color: #f8f9fa; /* Light text */
+        }
+        .dark-mode .sidebar {
+            background-color: #495057; /* Darker background for sidebar */
+        }
+        .dark-mode .sidebar ul li {
+            color: #adb5bd; /* Lighter text color for sidebar items */
+        }
+        .dark-mode .content {
+            background-color: #343a40; /* Optional: Dark background for content */
+        }
+        .dark-mode header {
+        background-color: #343a40; /* Dark background for header */
+        color: #f8f9fa; /* Light text color for header */
+    }
     </style>
 </head>
-<body>
-    <div class="container">
-        <button class="btn btn-secondary my-3" onclick="toggleDarkMode()">Toggle Dark Mode</button>
-        <h1 class="my-3">Open PRs in {{ org_name }}</h1>
-
-        <div class="row">
-            {% for repo, prs in prs_by_repo.items() %}
-                <div class="col-md-4 mb-4">
-                    <h2>{{ repo }}</h2>
-                    {% for pr in prs %}
-                        <div class="pr card card-body mb-3">
-                            <div class="pr-header">{{ pr.title }}</div>
-                            <div>Author: {{ pr.author }}</div>
-                            <div>Age: {{ pr.age }} days</div>
-                            <div>Comments: {{ pr.comments }}</div>
-                            <a href="{{ pr.url }}" class="btn btn-primary btn-sm" target="_blank">View PR</a>
-                        </div>
-                    {% endfor %}
+<body class="dark-mode">
+    <header style="background-color: #343a40; color: #f8f9fa; padding: 10px; text-align: center;">
+        <h1>{{ org_name }}</h1>
+    </header>
+    <div class="sidebar">
+        <h3>Repositories</h3>
+        <ul>
+            {% for repo, count in repo_pr_counts.items() %}
+                <li><a href="/repo/{{ repo }}">{{ repo }} ({{ count }} PRs)</a></li>
+            {% endfor %}
+        </ul>
+        <button onclick="toggleDarkMode()" id="darkModeToggle" style="position: absolute; bottom: 100px; width: 90%; left: 5%;">Toggle Dark Mode</button>
+    </div>
+    <div class="content">
+        {% if selected_prs %}
+            <h2>PRs in {{ selected_repo }}</h2>
+            {% for pr in selected_prs %}
+                <div class="pr card card-body mb-3">
+                    <div class="pr-header">{{ pr.title }}</div>
+                    <div>Author: {{ pr.author }}</div>
+                    <div>Age: {{ pr.age }} days</div>
+                    <div>Comments: {{ pr.comments }}</div>
+                    <a href="{{ pr.url }}" class="btn btn-primary btn-sm" target="_blank">View PR</a>
                 </div>
             {% endfor %}
-        </div>
+        {% else %}
+            <p>Select a repository to view PRs.</p>
+        {% endif %}
     </div>
 
     <script>
+        // Check and apply user's preferred theme on page load
+        if(localStorage.getItem('theme') === 'light') {
+            document.body.classList.remove('dark-mode');
+        }
+    
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
+            // Save the user's preference to local storage
+            if(document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
         }
     </script>
+    
 
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
