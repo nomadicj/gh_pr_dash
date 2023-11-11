@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  flask-app:
+    build: .
+    ports:
+      - "8080:5000"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - ORG_NAME=${ORG_NAME}
+    volumes:
+      - .:/usr/src/app
