@@ -22,15 +22,21 @@ def index(repo_name=None, categorisation=None):
     repos_response = get_github_org_data(org_name=org_name, headers=headers)
     repos = repos_response.json()
 
+    active_repos = [repo for repo in repos if not repo['archived']]
+
     current_prs = {}
     aging_prs = {}
     geriatric_prs = {}
     dependabot_prs = {}
 
-    for repo in repos:
+    for repo in active_repos:
         repo_url = repo['pulls_url'].replace('{/number}', '')
         prs_response = get_github_repo_data(repo=repo_url, headers=headers)
         prs = prs_response.json()
+
+        print(prs)
+
+        dependabot_prs_added = [pr for pr in prs if pr['user']['login'] == 'dependabot[bot]']
 
         dependabot_prs[repo['name']] = [{
             'title': pr['title'],
@@ -38,7 +44,9 @@ def index(repo_name=None, categorisation=None):
             'url': pr['html_url'],
             'age': calculate_age(pr['created_at']),
             'comments': pr.get('comments', 0)
-        } for pr in prs if pr['user']['login'] == 'dependabot[bot]']
+        } for pr in dependabot_prs_added]
+
+        prs = [pr for pr in prs if pr not in dependabot_prs_added]
 
         current_prs[repo['name']] = [{
             'title': pr['title'],
@@ -64,7 +72,7 @@ def index(repo_name=None, categorisation=None):
             'comments': pr.get('comments', 0)
         } for pr in prs if calculate_age(pr['created_at']) > 60]
 
-    repo_names = [repo['name'] for repo in repos]  # Extract repository names
+    repo_names = [repo['name'] for repo in active_repos]  # Extract repository names
 
     current_pr_counts = {repo: len(prs) for repo, prs in current_prs.items()}
     aging_pr_counts = {repo: len(prs) for repo, prs in aging_prs.items()}
@@ -82,12 +90,6 @@ def index(repo_name=None, categorisation=None):
         selected_prs = categorised_prs[categorisation][repo_name]
     else:
         selected_prs = []
-
-    print(f'Selected PRs: {selected_prs}')
-    print(f'Selected Category: {categorisation}')
-    print(f'Selected Repo: {repo_name}')
-    print(f'Selected cpr: {categorised_prs[categorisation]}')
-
 
     return render_template(
         'index.html',

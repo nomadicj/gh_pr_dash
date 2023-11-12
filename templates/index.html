@@ -23,6 +23,27 @@
             margin-left: 10px; /* Space between PR details and button */
         }
         .pr-header { font-weight: bold; }
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .header-logo {
+            position: absolute;
+            left: 10px;
+        }
+
+        .header-logo img {
+            height: 30px;  /* Adjust size as needed */
+        }
+
+        .header-title {
+            flex-grow: 1;
+            text-align: center;
+        }
+
         .dark-mode { background-color: #333; color: white; }
         .dark-mode .pr { border-color: #444; }
         .dark-mode {
@@ -81,11 +102,19 @@
         .dark-mode header {
         background-color: #343a40; /* Dark background for header */
         color: #f8f9fa; /* Light text color for header */
-    }
+        }
+        .floating-button {
+            position: fixed; /* or 'absolute' */
+            bottom: 20px;
+            right: 20px;
+        }
     </style>
 </head>
 <body class="dark-mode">
     <header style="background-color: #343a40; color: #f8f9fa; padding: 10px; text-align: center;">
+        <a href="/" class="logo"></a>
+            <img src="https://github.com/{{ org_name }}.png" alt="Logo" id="logo">
+        </a>
         <h1>{{ org_name }}</h1>
     </header>
     <div class="sidebar">
@@ -121,10 +150,10 @@
             {% endfor %}
         </ul>
         <!-- Refresh Data Button -->
-        <a href="/refresh" class="btn btn-primary" style="position: absolute; bottom: 140px; width: 90%; left: 5%;">Refresh Data</a>
+        <a href="/refresh" class="btn btn-primary" style="position: absolute; bottom: 240px; width: 90%; left: 5%;">Refresh Data</a>
 
         <!-- Existing Dark Mode Toggle Button -->
-        <button onclick="toggleDarkMode()" id="darkModeToggle" style="position: absolute; bottom: 100px; width: 90%; left: 5%;">Toggle Dark Mode</button>
+        <button onclick="toggleDarkMode()" id="darkModeToggle" style="position: absolute; bottom: 200px; width: 90%; left: 5%;">Toggle Dark Mode</button>
     </div>
 
     <div class="content">
