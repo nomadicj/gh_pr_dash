@@ -7,7 +7,21 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
-        .pr { border: 1px solid #ddd; padding: 10px; margin-bottom: 20px; }
+        .pr {
+            display: flex;
+            align-items: center; /* Align details and button */
+            justify-content: space-between; /* Space between details and button */
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #495057;
+        }
+
+        .view-pr-btn {
+            writing-mode: vertical-rl; /* Rotate the text */
+            transform: rotate(0deg); /* Correct the text orientation */
+            margin-left: 10px; /* Space between PR details and button */
+        }
         .pr-header { font-weight: bold; }
         .dark-mode { background-color: #333; color: white; }
         .dark-mode .pr { border-color: #444; }
@@ -37,11 +51,11 @@
             overflow-y: auto;
             background-color: #f8f9fa;
             padding: 20px;
-            width: 250px; /* Adjust as needed */
+            width: 350px; /* Adjust as needed */
             position: fixed;
         }
         .content {
-            margin-left: 250px; /* Adjust based on sidebar width */
+            margin-left: 375px; /* Adjust based on sidebar width */
         }
         .sidebar {
             /* ... existing sidebar styles ... */
@@ -76,23 +90,55 @@
     </header>
     <div class="sidebar">
         <h3>Repositories</h3>
+        <!-- Current PRs Section -->
+        <h4>Current PRs</h4>
         <ul>
-            {% for repo, count in repo_pr_counts.items() %}
-                <li><a href="/repo/{{ repo }}">{{ repo }} ({{ count }} PRs)</a></li>
+            {% for repo, count in current_pr_counts.items() %}
+                <li><a href="/repo/{{ repo }}/current">{{ repo }} ({{ count }} PRs)</a></li>
             {% endfor %}
         </ul>
+
+        <!-- Aging PRs Section -->
+        <h4>Aging PRs</h4>
+        <ul>
+            {% for repo, count in aging_pr_counts.items() %}
+                <li><a href="/repo/{{ repo }}/aging">{{ repo }} ({{ count }} PRs)</a></li>
+            {% endfor %}
+        </ul>
+
+        <!-- Geriatric PRs Section -->
+        <h4>Geriatric PRs</h4>
+        <ul>
+            {% for repo, count in geriatric_pr_counts.items() %}
+                <li><a href="/repo/{{ repo }}/geriatric">{{ repo }} ({{ count }} PRs)</a></li>
+            {% endfor %}
+        </ul>
+        <!-- Dependabot PRs Section -->
+        <h4>Dependabot PRs</h4>
+        <ul>
+            {% for repo, count in dependabot_pr_counts.items() %}
+                <li><a href="/repo/{{ repo }}/dependabot">{{ repo }} ({{ count }} PRs)</a></li>
+            {% endfor %}
+        </ul>
+        <!-- Refresh Data Button -->
+        <a href="/refresh" class="btn btn-primary" style="position: absolute; bottom: 140px; width: 90%; left: 5%;">Refresh Data</a>
+
+        <!-- Existing Dark Mode Toggle Button -->
         <button onclick="toggleDarkMode()" id="darkModeToggle" style="position: absolute; bottom: 100px; width: 90%; left: 5%;">Toggle Dark Mode</button>
     </div>
+
     <div class="content">
         {% if selected_prs %}
-            <h2>PRs in {{ selected_repo }}</h2>
+            <h2>{{ selected_category }} PRs in {{ selected_repo }}</h2>
             {% for pr in selected_prs %}
-                <div class="pr card card-body mb-3">
-                    <div class="pr-header">{{ pr.title }}</div>
-                    <div>Author: {{ pr.author }}</div>
-                    <div>Age: {{ pr.age }} days</div>
-                    <div>Comments: {{ pr.comments }}</div>
-                    <a href="{{ pr.url }}" class="btn btn-primary btn-sm" target="_blank">View PR</a>
+                <div class="pr">
+                    <div>
+                        <div class="pr-header">{{ pr.title }}</div>
+                        <div>Author: {{ pr.author }}</div>
+                        <div>Age: {{ pr.age }} days</div>
+                        <div>Comments: {{ pr.comments }}</div>
+                    </div>
+                    <a href="{{ pr.url }}" class="btn btn-primary view-pr-btn" target="_blank">View PR</a>
                 </div>
             {% endfor %}
         {% else %}
